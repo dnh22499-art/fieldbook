@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!--fieldbook:csp-->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fieldbook — Sign in</title>
+<link rel="icon" href="favicon.svg">
+<link rel="stylesheet" href="static/pages.css">
+</head>
+<body>
+<div class="lang" role="group" aria-label="Language"><button data-lang="en">English</button><button data-lang="vi">Tiếng Việt</button></div>
+<main class="wrap">
+  <div class="brand"><img src="favicon.svg" alt="">Fieldbook</div>
+  <div class="card">
+    <h1 id="title"></h1>
+    <p class="sub" id="subtitle"></p>
+    <form id="form" novalidate>
+      <div id="nameRow" hidden><label for="name" data-t="name"></label><input id="name" autocomplete="name" maxlength="80"></div>
+      <label for="email" data-t="email"></label><input id="email" type="email" autocomplete="username" maxlength="200" required>
+      <label for="password" data-t="password"></label><input id="password" type="password" autocomplete="current-password" maxlength="200" required>
+      <div class="hint" id="pwHint" hidden data-t="pwHint"></div>
+      <button class="btn btn-primary full" id="submit" type="submit"></button>
+      <div class="msg err" id="err" hidden role="alert"></div>
+    </form>
+    <div class="switch" id="switch"></div>
+  </div>
+  <p class="hint" style="text-align:center;" id="foot" data-t="forgot"></p>
+</main>
+<script src="static/config.js"></script>
+<script src="static/client.js"></script>
+<script src="static/login.js"></script>
+
+</body>
+</html>

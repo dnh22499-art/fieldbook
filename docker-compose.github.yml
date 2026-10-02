@@ -1,0 +1,46 @@
+# Fieldbook on the NAS, installed from the image GitHub builds (.github/workflows/docker.yml).
+# Replace OWNER/REPO with your GitHub repository (lower case), e.g. ghcr.io/acme/fieldbook:latest
+#
+#   docker compose -f docker-compose.github.yml up -d
+#
+# Every push to main builds a new image; Watchtower checks every 5 minutes and restarts
+# Fieldbook on the new version. Your data in ./data is never touched by updates.
+services:
+  fieldbook:
+    image: ghcr.io/OWNER/REPO:latest
+    container_name: fieldbook
+    restart: unless-stopped
+    env_file: .env
+    environment:
+      DATA_DIR: /data
+      PORT: "8080"
+      TZ: ${TZ:-Asia/Ho_Chi_Minh}
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/data           # real-time database, uploaded files and daily backups — back this folder up
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+
+  # Auto-updater. (The original containrrr/watchtower was archived in Dec 2025;
+  # this is its maintained fork with the same options and labels.)
+  watchtower:
+    image: nickfedor/watchtower:latest
+    container_name: fieldbook-updater
+    restart: unless-stopped
+    command: --label-enable --cleanup --interval 300
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      # Private image? run `docker login ghcr.io` on the NAS once, then uncomment:
+      # - /root/.docker/config.json:/config.json:ro
+
+  tunnel:
+    profiles: ["tunnel"]
+    image: cloudflare/cloudflared:latest
+    container_name: fieldbook-tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - fieldbook

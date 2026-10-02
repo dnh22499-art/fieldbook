@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<!--fieldbook:csp-->
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fieldbook — Account</title>
+<link rel="icon" href="favicon.svg">
+<link rel="stylesheet" href="static/pages.css">
+</head>
+<body>
+<div class="lang" role="group" aria-label="Language"><button data-lang="en">English</button><button data-lang="vi">Tiếng Việt</button></div>
+<main class="wrap wide">
+  <div class="brand"><img src="favicon.svg" alt="">Fieldbook</div>
+  <p><a href="./" data-t="back"></a></p>
+
+  <section class="card">
+    <h1 data-t="title"></h1>
+    <p class="sub" id="who"></p>
+    <button class="btn btn-ghost" id="logout" type="button" data-t="logout"></button>
+  </section>
+
+  <section class="card">
+    <h2 data-t="nameTitle"></h2>
+    <form id="nameForm" class="row" style="align-items:flex-end;">
+      <div><label for="myName" data-t="name"></label><input id="myName" maxlength="80" autocomplete="name"></div>
+      <div style="flex:0 0 auto;"><button class="btn btn-ghost" type="submit" data-t="save"></button></div>
+    </form>
+    <div class="msg" id="nameMsg" hidden></div>
+  </section>
+
+  <section class="card">
+    <h2 data-t="pwTitle"></h2>
+    <form id="pwForm">
+      <label for="cur" data-t="current"></label><input id="cur" type="password" autocomplete="current-password" maxlength="200">
+      <label for="new1" data-t="newPw"></label><input id="new1" type="password" autocomplete="new-password" maxlength="200">
+      <div class="hint" data-t="pwHint"></div>
+      <button class="btn btn-primary" type="submit" style="margin-top:16px;" data-t="changePw"></button>
+      <div class="msg" id="pwMsg" hidden></div>
+    </form>
+  </section>
+
+  <section class="card" id="admin" hidden>
+    <h2 data-t="accTitle"></h2>
+    <p class="sub" data-t="accSub"></p>
+    <div class="table-wrap"><table>
+      <thead><tr><th data-t="person"></th><th data-t="role"></th><th data-t="state"></th><th></th></tr></thead>
+      <tbody id="rows"></tbody>
+    </table></div>
+    <div class="msg" id="accMsg" hidden></div>
+
+    <h2 style="margin-top:28px;" data-t="addTitle"></h2>
+    <form id="addForm">
+      <div class="row">
+        <div><label for="aName" data-t="name"></label><input id="aName" maxlength="80"></div>
+        <div><label for="aEmail" data-t="email"></label><input id="aEmail" type="email" maxlength="200"></div>
+        <div><label for="aRole" data-t="role"></label><select id="aRole">
+          <option value="pm" data-t="pm"></option><option value="accountant" data-t="accountant"></option><option value="admin" data-t="adminRole"></option><option value="" data-t="noneYet"></option>
+        </select></div>
+      </div>
+      <label style="display:flex;gap:8px;align-items:center;text-transform:none;letter-spacing:0;font-weight:500;" id="mailRow" hidden><input type="checkbox" id="aMail" style="width:auto;" checked> <span data-t="sendMail"></span></label>
+      <button class="btn btn-primary" type="submit" style="margin-top:16px;" data-t="add"></button>
+    </form>
+    <div class="msg" id="addMsg" hidden></div>
+  </section>
+</main>
+<script src="static/config.js"></script>
+<script src="static/client.js"></script>
+<script src="static/account.js"></script>
+
+</body>
+</html>

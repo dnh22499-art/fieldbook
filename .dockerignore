@@ -1,0 +1,6 @@
+data
+_site
+.env
+test
+node_modules
+*.zip

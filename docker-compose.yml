@@ -1,0 +1,38 @@
+# Fieldbook on a Ugreen NAS (or any Docker host).
+# Nothing to build: the official Node.js image runs the Fieldbook files in this folder.
+#
+#   docker compose up -d                      → http://<NAS-IP>:8080 on the office network
+#   docker compose --profile tunnel up -d     → also reachable from outside through Cloudflare Tunnel
+services:
+  fieldbook:
+    image: node:22-alpine
+    container_name: fieldbook
+    restart: unless-stopped
+    working_dir: /app
+    command: ["node", "--disable-warning=ExperimentalWarning", "server/index.js"]
+    env_file: .env
+    environment:
+      DATA_DIR: /data
+      PORT: "8080"
+      TZ: ${TZ:-Asia/Ho_Chi_Minh}
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/app:ro             # the Fieldbook program (read-only)
+      - ./data:/data           # database, uploaded files and daily backups — back this folder up
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1:8080/healthz"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  tunnel:
+    profiles: ["tunnel"]
+    image: cloudflare/cloudflared:latest
+    container_name: fieldbook-tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - fieldbook

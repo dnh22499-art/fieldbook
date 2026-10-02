@@ -1,0 +1,17 @@
+{
+  "name": "fieldbook-web",
+  "version": "3.1.0",
+  "description": "Fieldbook — self-hosted construction project website (front end + back end) for a Ugreen NAS or any PC.",
+  "private": true,
+  "type": "module",
+  "engines": {
+    "node": ">=22.13"
+  },
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning server/index.js",
+    "dev": "node --disable-warning=ExperimentalWarning --watch server/index.js",
+    "test": "node --disable-warning=ExperimentalWarning --test test/*.test.js",
+    "backup": "node scripts/backup.js",
+    "reset-password": "node scripts/reset-password.js"
+  }
+}
