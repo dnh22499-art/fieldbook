@@ -1,0 +1,33 @@
+# BƯỚC 2 — Thêm Cloudflare Tunnel và cho phép website fieldbook.ddbuilder.us (Phần 3 và 5)
+# Docker → Project → fieldbook → Edit → xoá hết, dán toàn bộ file này.
+# CHỈ SỬA MỘT CHỖ: thay DAN-TOKEN-CLOUDFLARE-VAO-DAY bằng token tunnel (bắt đầu bằng eyJ...).
+services:
+  fieldbook:
+    image: node:22-alpine
+    container_name: fieldbook
+    restart: unless-stopped
+    working_dir: /app
+    command: ["node", "--disable-warning=ExperimentalWarning", "server/index.js"]
+    environment:
+      DATA_DIR: /data
+      PORT: "8080"
+      TZ: Asia/Ho_Chi_Minh
+      ALLOW_SIGNUP: "true"
+      TRUST_PROXY: "true"
+      PUBLIC_URL: "https://fieldbook.ddbuilder.us"
+      ALLOWED_ORIGINS: "https://fieldbook.ddbuilder.us"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/app:ro
+      - ./data:/data
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: fieldbook-tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: "DAN-TOKEN-CLOUDFLARE-VAO-DAY"
+    depends_on:
+      - fieldbook

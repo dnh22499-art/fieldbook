@@ -1,0 +1,42 @@
+# BƯỚC 3 (tuỳ chọn) — NAS chạy bản do GitHub build và tự cập nhật (Phần 6)
+# Docker → Project → fieldbook → Edit → xoá hết, dán toàn bộ file này.
+# SỬA HAI CHỖ:
+#   TEN-GITHUB                   → tên tài khoản GitHub của bạn, viết chữ thường
+#   DAN-TOKEN-CLOUDFLARE-VAO-DAY → token tunnel (giống bước 2)
+services:
+  fieldbook:
+    image: ghcr.io/TEN-GITHUB/fieldbook:latest
+    container_name: fieldbook
+    restart: unless-stopped
+    environment:
+      DATA_DIR: /data
+      PORT: "8080"
+      TZ: Asia/Ho_Chi_Minh
+      ALLOW_SIGNUP: "true"
+      TRUST_PROXY: "true"
+      PUBLIC_URL: "https://fieldbook.ddbuilder.us"
+      ALLOWED_ORIGINS: "https://fieldbook.ddbuilder.us"
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/data
+    labels:
+      - com.centurylinklabs.watchtower.enable=true
+
+  tunnel:
+    image: cloudflare/cloudflared:latest
+    container_name: fieldbook-tunnel
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run
+    environment:
+      TUNNEL_TOKEN: "DAN-TOKEN-CLOUDFLARE-VAO-DAY"
+    depends_on:
+      - fieldbook
+
+  watchtower:
+    image: nickfedor/watchtower:latest
+    container_name: fieldbook-updater
+    restart: unless-stopped
+    command: --label-enable --cleanup --interval 300
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock

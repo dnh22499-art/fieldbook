@@ -1,0 +1,23 @@
+# BƯỚC 1 — Fieldbook chạy trong văn phòng (Phần 2 của hướng dẫn)
+# Dán TOÀN BỘ nội dung file này vào: Docker → Project → Create → ô Compose.
+# Sau đó mở http://<IP-của-NAS>:8080
+services:
+  fieldbook:
+    image: node:22-alpine
+    container_name: fieldbook
+    restart: unless-stopped
+    working_dir: /app
+    command: ["node", "--disable-warning=ExperimentalWarning", "server/index.js"]
+    environment:
+      DATA_DIR: /data
+      PORT: "8080"
+      TZ: Asia/Ho_Chi_Minh
+      ALLOW_SIGNUP: "true"
+      TRUST_PROXY: "false"
+      PUBLIC_URL: ""
+      ALLOWED_ORIGINS: ""
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./:/app:ro
+      - ./data:/data

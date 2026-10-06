@@ -3,8 +3,10 @@
 #
 # One-time setup in the GitHub repository:
 #   Settings → Pages → Build and deployment → Source: "GitHub Actions"
-#   Settings → Secrets and variables → Actions → Variables → New variable:
-#       FIELDBOOK_API_URL = https://fieldbook-api.example.com   (the NAS address through Cloudflare Tunnel)
+#   Settings → Pages → Custom domain: fieldbook.ddbuilder.us
+# The NAS address defaults to https://fieldbook-api.ddbuilder.us (Cloudflare Tunnel).
+# To use another one, add a repository variable FIELDBOOK_API_URL
+# (Settings → Secrets and variables → Actions → Variables).
 name: Deploy website to GitHub Pages
 on:
   push:
@@ -21,20 +23,18 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      FIELDBOOK_API_URL: ${{ vars.FIELDBOOK_API_URL || 'https://fieldbook-api.ddbuilder.us' }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
       - run: npm test
-      - name: Check the server address is set
-        run: |
-          if [ -z "${{ vars.FIELDBOOK_API_URL }}" ]; then
-            echo "::error::Set the repository variable FIELDBOOK_API_URL (Settings → Secrets and variables → Actions → Variables)."
-            exit 1
-          fi
+      - name: Show the NAS address the website will use
+        run: echo "Fieldbook server (NAS) = $FIELDBOOK_API_URL"
       - run: sh scripts/fetch-pdfjs.sh "$RUNNER_TEMP/pdfjs"
-      - run: node scripts/build-pages.mjs --api "${{ vars.FIELDBOOK_API_URL }}" --out _site --pdfjs "$RUNNER_TEMP/pdfjs"
+      - run: node scripts/build-pages.mjs --api "$FIELDBOOK_API_URL" --out _site --pdfjs "$RUNNER_TEMP/pdfjs"
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
