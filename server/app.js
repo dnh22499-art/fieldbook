@@ -117,6 +117,7 @@ export function createApp(config, { log = console } = {}) {
   }
 
   /* Pages on another site (GitHub Pages) may call this server only from ALLOWED_ORIGINS. */
+  const fileAncestors = ["'self'", ...config.allowedOrigins].join(" ");
   const allowedOrigin = (req) => { const o = req.headers.origin; return o && config.allowedOrigins.includes(o) ? o : ""; };
 
   /* Live updates for pages on another site: an EventSource can't send a token, so the page
@@ -488,8 +489,10 @@ export function createApp(config, { log = console } = {}) {
           "content-length": a.size,
           "content-disposition": `${inline ? "inline" : "attachment"}; filename="${fname}"; filename*=UTF-8''${encodeURIComponent(a.name || "file")}`,
           "cache-control": "private, max-age=31536000, immutable",
-          "content-security-policy": a.content_type === "application/pdf" ? "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'" : "default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; sandbox",
-          "x-frame-options": "SAMEORIGIN",
+          // The GitHub Pages website (another origin listed in ALLOWED_ORIGINS) shows files
+          // in a frame, so frame-ancestors names it; X-Frame-Options can't list origins.
+          "content-security-policy": `default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; frame-ancestors ${fileAncestors}${a.content_type === "application/pdf" ? "" : "; sandbox"}`,
+          ...(config.allowedOrigins.length ? {} : { "x-frame-options": "SAMEORIGIN" }),
         });
         if (req.method === "HEAD") return res.end();
         return fs.createReadStream(store.assetPath(a.id)).on("error", () => res.destroy()).pipe(res);
